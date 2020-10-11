@@ -89,6 +89,8 @@ https://docs.npmjs.com/cli/link.html
 
 `"postinstall": "cd global-cli && npm install"`
 
+-> npm rm --global foo , npm ls --global foo, npm ls --global --depth 0 , 아니면 진짜 위치가서 지우는게 빠름
+
 - 중첩 구조
 https://stackoverflow.com/questions/31773546/the-best-way-to-run-npm-install-for-nested-folders
 

@@ -7,6 +7,13 @@ _coming soon_
 [react github](https://github.com/facebook/react)
 
 ## 개발 목표
+1. npm install  -g create-hayoung-app 
+전역 설치하면 create-hayoung-app "앱 이름" 해서 사용가능하다. 
+
+* 실제 create-react-app도 전역설치해서 사용함 https://eunvanz.github.io/react/2018/06/05/React-create-react-app%EC%9C%BC%EB%A1%9C-%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8-%EC%8B%9C%EC%9E%91%ED%95%98%EA%B8%B0/
+  
+2. npx create-hayoung-app hello
+
 react 앱을 create-react-app없이 만드는 법을 공부하고, 가능하면 이걸 create-hayoung-app 이런 식으로 cli 로 내가 설정한 걸 다운로드 받을 수 잇게 만드는것이 목표!
 
 
