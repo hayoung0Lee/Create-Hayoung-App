@@ -1,0 +1,30 @@
+{
+  "name": "create-hayoung-app",
+  "version": "1.0.0",
+  "description": "cra를 따라해보는 것입니다",
+  "main": "global-cli/index.js",
+  "bin": {
+    "create-hayoung-app": "./bin/create-hayoung-app.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd global-cli && npm install"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hayoung0Lee/Create-Hayoung-App.git"
+  },
+  "keywords": [
+    "react",
+    "cli"
+  ],
+  "author": "hayoung",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/hayoung0Lee/Create-Hayoung-App/issues"
+  },
+  "homepage": "https://github.com/hayoung0Lee/Create-Hayoung-App#readme"
+}
