@@ -26,5 +26,6 @@
   "bugs": {
     "url": "https://github.com/hayoung0Lee/Create-Hayoung-App/issues"
   },
-  "homepage": "https://github.com/hayoung0Lee/Create-Hayoung-App#readme"
+  "homepage": "https://github.com/hayoung0Lee/Create-Hayoung-App#readme",
+  "dependencies": {}
 }
