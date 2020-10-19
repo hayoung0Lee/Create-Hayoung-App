@@ -109,3 +109,7 @@ https://nodejs.org/api/path.html#path_path_resolve_paths
 
 
 7. create-hayoung-app 하면 폴더생기고 안에 package.json파일이 있다!!
+
+8. symlink error
+가서 지워...
+

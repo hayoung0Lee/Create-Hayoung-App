@@ -1,6 +1,6 @@
 {
   "name": "create-hayoung-app",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "cra를 따라해보는 것입니다",
   "main": "global-cli/index.js",
   "bin": {
