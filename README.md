@@ -43,19 +43,103 @@
     },
     ```
 
-    * bin의 역할
+    * [bin의 역할](https://programmingsummaries.tistory.com/385)
+      * 이 부분이 이번에 공부하면서 가장 감명깊었던 내용이다. 위의 링크의 내용을 요약하자면, 실행할 수 있는 패키지를 만들기 위해서 bin을 사용한다. bin 안에 "create-hayoung-app": "./bin/create-hayoung-app.js" 이렇게 설정하면 global로 설치하는 경우에는 npm이 글로벌에 설치한 후 해당 경로로 심볼릭 링크를 생성하고, 로컬에 설치하게 되면 node_modules폴더내에 .bin 폴더에 심볼릭 링크를 만든다. (사실 이부분은 좀더 공부를 해야 제대로 이해할 수 있을 것 같다!!)
+      * link라는 것을 공부할 때 본 자료: 
+        * `npm link`: This will globally install a symlink linking to your current project so there's no need for you to re-run this when we update our code. After running npm link you should have your CLI commands available. [참고한 글](https://docs.npmjs.com/cli/link.html)
+        * npm ls --global 이걸 통해서 global symlink를 확인했다.(좀 100프로 이해하는 것은 아닌데, 나중에 더 공부해보고 제대로 이해하면 다시 글을 정리해야겠다.)
+
+
 
     * scripts의 역할
-      * postinstall을 사용한 이유: npm install했을때 global-cli안의 package.json에 설정되어있는 패키지들도 설치할 수 있도록 하기 위해서 사용했습니다. 
+      * postinstall을 사용한 이유: npm install했을때 global-cli안의 package.json에 설정되어있는 패키지들도 설치할 수 있도록 하기 위해서 사용했습니다. [참고한 글](https://docs.npmjs.com/cli/link.html)
 
-2. npmignore의 역할 vs gitignore의 역할
+2. [npmignore의 역할 vs gitignore의 역할](https://blog.utopian.dev/npm/npmignore-vs-gitignore-which-one-to-use/)
+    npm은 publish할 때 npmignore가 없으면 gitignore를 참고해서 해당 파일을 무시하고 publish하지않는다. 나는 diary의 내용은 내 리포에는 올리고 싶어서 gitignore파일에는 포함하지 않았고, npmignore는 포함해서 퍼블리시 되지않도록 했다. 
 
-3. bin폴더의 역할
+
+3. bin폴더의 역할   
+    ```
+    #!/usr/bin/env node
+    // require = require('esm')(module /*, options*/);
+    require('../global-cli/index').cliInit(process.argv);
+    ```
+    `#!/usr/bin/env node `이부분은 cli를 만들때 꼭 필요하다고 한다 이렇게 해야 글로벌 cli를 만들수 있다고 하는데 정확한 동작원리는 파악이 아직 어려웠다. 이 파일의 역할은 global-cli 폴더의 index파일에서 export해주는 cliInit이라는 함수를 실행한다. 
 
 4. global-cli폴더의 역할
+    * cliInit: npm create-hayoung-app appname 다음에 오는 arguments를 받는 곳이다. `const commands = argv.slice(2);` 를 통해 argv가 인수를 받아올 수 있다. 우리는 무조건 앱이름은 있어야해서 앱이름이 없으면 오류를 내고 프로세스를 종료하고, 성공적이면 createApp함수를 실행한다. 
 
+    * createApp: 사용자가 넘겨준 앱이름을 이용해서 폴더를 생성하고(이미 존재하는 경우 에러를 내고 종료) 
+        ```
+        const packageJson = {
+            name: appName,
+            version: '0.0.1',
+            description: 'app from create-hayoug-app',
+            private: true,
+        };
+        fs.writeFileSync(path.join(root, 'package.json'), JSON.stringify(packageJson));
+        ``` 
+        * packageJson이라는 객체를 생성하고 writeFileSync함수를 통해서 앱의 위치에 package.json이라는 이름으로 파일을 생성해준다. 
+
+        * `process.chdir(root); // root안으로 이동` 을 통해서 chdir함수를 이용하면 프로세스의 위치를 쉽게 이동할 수 잇다. 
+
+    * run: spawn - A cross platform solution to node's spawn and spawnSync(https://backback.tistory.com/362) - 을 통해서 npm install을 실행하는 곳이다. 
+        ```
+        const args = [
+            'install'
+        ]
+        const proc = spawn('npm', args, {stdio: 'inherit'}); // process실행
+        proc.on('close', function(code) {
+            if(code != 0){
+                console.log("npm error!");
+            } else {
+                getHayoungTemplate(root, appName)
+            }
+        })
+        ``` 
+        * install이라는 argument를 넘겨주고, npm install이 잘 실행되면 getHayoungTemplate함수를 실행한다. 
+
+    * getHayoungTemplate
+        ```
+        const rootPackage= JSON.parse(fs.readFileSync(path.join(root, 'package.json'), {encoding: 'utf-8'}))
+        
+        rootPackage.main = "index.js";
+
+        rootPackage.scripts = {};
+        rootPackage.scripts["start"] = "webpack serve --mode development --open --hot";
+        rootPackage.scripts["build"] = "webpack --mode production";
+
+        rootPackage.dependencies = {}
+        rootPackage.dependencies["react"] = "^16.14.0";
+        rootPackage.dependencies["react-dom"] = "^16.14.0";
+        
+        rootPackage.devDependencies = {}
+        rootPackage.devDependencies["babel-core"] = "^6.26.3";
+        rootPackage.devDependencies["babel-loader"] = "^7.1.5";
+        rootPackage.devDependencies["babel-preset-env"] = "^1.7.0";
+        rootPackage.devDependencies["babel-preset-react"] = "^6.24.1";
+        rootPackage.devDependencies["html-webpack-plugin"] = "^4.5.0";
+        rootPackage.devDependencies["webpack"] = "^5.1.3" ;
+        rootPackage.devDependencies["webpack-cli"] = "^4.1.0";
+        rootPackage.devDependencies["webpack-dev-server"] = "^3.11.0";
+
+        fs.writeFileSync(
+            path.join(root, 'package.json'),
+            JSON.stringify(rootPackage, null, 2)
+        );
+        ```
+      * 위의 방식대로 루트에 우리가 생성했던 package.json을 읽어온다음 자바스크립트의 객체를 다루는 방식대로 우리가 원하는 내용을 써준다. 나는 scripts에 필요한 내용, 디펜던시 등을 작성했다. 그다은 spawn을 통해 npm install을 실행했다.
+
+      * 그다음은 template 폴더만 복사하면 끝이다. 
+  
 5. template폴더의 역할
-
+    ```
+    const targetFolder = path.join(__dirname, '..', './templates');
+    fs.copySync(targetFolder, path.join(root));
+    ```
+    * global-cli/index.js 파일의 getHayoungTemplate함수에서 위의 코드를 통해서 templates폴더의 파일들을 모두 복사해서 npm create-hayoung-app appname명령어가 실행되는 앱내에 templates내의 내용을 붙여 넣기 한다. 
+    * __dirname을 통해서 index.js 파일이 있는 곳의 위치를 접근해서 templates폴더에 접근했다. root는 npm create-hayoung-app appname명령어가 실행되는 곳이기 때문에 copySync(a, b), 즉 경로 a의 파일을 b로 복사하는 명령어를 통해 templates의 파일들을 복붙해주었다. 
+    
 
 ## 참고할 자료
 - [facebook](https://github.com/facebook/create-react-app)
